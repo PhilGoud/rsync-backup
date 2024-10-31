@@ -52,14 +52,23 @@ echo "Mounting Individual backup volumes"
 
 # Loop through each volume number from 1 to NUMBERVOLUMES
 for ((i=1; i<=NUMBERVOLUMES; i++)); do
-   mount_point="${MOUNT_PREFIX}${i}" # Define mountpoint
-   sudo mount "$mount_point" # Attempt to mount the device
+   # Define the mount point
+   mount_point="${MOUNT_PREFIX}${i}"
 
-   if [ $? -eq 0 ]; then
-       echo "Mounted $mount_point successfully."
+   # Check if the mount point is already mounted
+   if mountpoint -q "$mount_point"; then
+       echo "$mount_point is already mounted."
    else
-       echo "Failed to mount $mount_point."
-       exit 1 # Exit if mounting fails
+       # Attempt to mount the device
+       sudo mount "$mount_point"
+       
+       # Check if the mount was successful
+       if [ $? -eq 0 ]; then
+           echo "Mounted $mount_point successfully."
+       else
+           echo "Failed to mount $mount_point."
+           exit
+       fi
    fi
 done
 
